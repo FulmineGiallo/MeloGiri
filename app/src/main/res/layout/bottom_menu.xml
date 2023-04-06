@@ -27,7 +27,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:background="@color/ciano"
         android:elevation="8dp"
-        app:itemIconTint="@color/ciano"
+
         app:itemTextColor="@color/ciano"
         android:layout_alignParentBottom="true"
         app:menu="@menu/menuhompage"
