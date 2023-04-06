@@ -13,14 +13,15 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             >
+
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:padding="20dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:padding="20dp"
-                tools:srcCompat="@tools:sample/avatars">
+                app:srcCompat="@drawable/drink">
 
             </ImageView>
             <TextView
@@ -237,13 +238,13 @@
 
                 <ImageView
                     android:id="@+id/image_facciaRegister"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:padding="10dp"
                     app:layout_constraintLeft_toRightOf="@id/text"
                     app:layout_constraintRight_toLeftOf="@id/text"
                     app:layout_constraintTop_toBottomOf="@id/text"
-                    tools:srcCompat="@tools:sample/avatars">
+                    app:srcCompat="@drawable/reg_faceid">
 
                 </ImageView>
 
