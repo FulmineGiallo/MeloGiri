@@ -22,12 +22,14 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/grigiobottone"
                 android:text="Soft Drink"
+                android:drawableLeft="@drawable/coffee_cup"
                 android:layout_marginHorizontal="10dp" />
             <Button
                 android:id="@+id/btn_alcolici"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Alcolici"
+                android:drawableLeft="@drawable/drink__1_"
                 android:backgroundTint="@color/grigiobottone"
                 android:layout_marginHorizontal="10dp" />
 
@@ -37,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:text="Analcolici"
                 android:backgroundTint="@color/grigiobottone"
+                android:drawableLeft="@drawable/cocktail__1_"
                 android:layout_marginHorizontal="10dp" />
             <Button
                 android:id="@+id/btn_vini"
@@ -44,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:text="Vini"
                 android:backgroundTint="@color/grigiobottone"
+                android:drawableLeft="@drawable/glass_with_wine__1_"
                 android:layout_marginHorizontal="10dp"
                 >
             </Button>
