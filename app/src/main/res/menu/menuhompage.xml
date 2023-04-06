@@ -2,20 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/profile"
-        android:icon="@drawable/ic_profile__1_"
+        android:icon="@drawable/profile"
         android:title="Profilo" />
 
     <item
         android:id="@+id/home"
         android:title="Homepage"
-        android:icon="@drawable/ic_icon_home" />
+        android:icon="@drawable/home" />
     <item
         android:id="@+id/history"
         android:title="History"
-        android:icon="@drawable/ic_chat" />
+        android:icon="@drawable/heart" />
     <item
         android:id="@+id/carrello"
         android:title="Carrello"
-        android:icon="@drawable/ic_icon_bell_on"
-        android:visible="false"/>
+        android:icon="@drawable/cart" />
+
 </menu>
