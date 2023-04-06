@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/profile"
-        android:icon="@drawable/profile"
+        android:icon="@drawable/icons8_user_male_48"
         android:title="Profilo" />
 
     <item
