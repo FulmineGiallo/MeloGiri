@@ -12,11 +12,19 @@
 
 #define PORT 8080
 #define MESSAGE_SIZE 256
-char *subString(char *string, int posIniziale, int posFinale)
+void trim(char *str);
+
+char *subString(char *string, char *posIniziale, char *posFinale)
 {
+    int len = (posFinale - posIniziale) - 1;
+    char *subString = malloc(len + 1); // +1 per il carattere di terminazione
 
+    strncpy(subString, posIniziale, len);
+    subString[len] = '\0'; // aggiungi il carattere di terminazione
 
-	return "ciao";
+	trim(subString);
+
+    return subString;
 }
 
 void trim(char *str)
@@ -175,62 +183,33 @@ void *thread_login(void *arg)
 		/*
 		Il Client manda la sequenza: nome_cognome&data?email!password
 		*/
-		char nome[100];
-		char cognome[100];
-		char data[100];
-		char email[100];
-		char password[100];
-		char nomeFormattato[100];
+		char *nome;
+		char *cognome;
+		char *data;
+		char *email;
+		char *password;
+		
 		
 		//LUNGHEZZA DI TUTTO IL MESSAGGIO INVIATO
 		int lenRegister = strlen(sceltaStart) - 1;
 
 		//Recupero Nome
-		char *posNome = strchr(sceltaStart, '_');
-		int lenNome = posNome - sceltaStart;
-		strncpy(nome, sceltaStart, lenNome);
-		strcpy(nomeFormattato, nome + 1);
-		//Cancello MEMORIA? No, in locale quando la funzione viene chiusa, viene anche deallocata la memoria.
-	
-		//RECUPERO COGNOME
-		char *posCognome = strchr(sceltaStart, '_') + 1;
-		//IN QUESTO PUNTO QUI ho: cognome&data?email!password
-		int lenCognome = (posCognome - sceltaStart) + 1;
-		strncpy(cognome, posCognome, lenCognome);
-		trim(cognome);
+		nome = subString(strchr(sceltaStart, '2') + 1, strchr(sceltaStart, '2') + 1, strchr(sceltaStart, '_') + 1);
 
+		//RECUPERO COGNOME
+		cognome = subString(strchr(sceltaStart, '_') + 1, strchr(sceltaStart, '_') + 1, strchr(sceltaStart, '&') + 1);
 
 		//RECUPERO Data
-		char *posDataInzio = strchr(sceltaStart, '&') + 1;
-		//IN QUESTO PUNTO QUI ho: posDataInizio = data?email!password
-		char *posDataFine = strchr(sceltaStart, '?') + 1;
-		int lenData = (posDataFine - posDataInzio) - 1;
-
-		strncpy(data, posDataInzio, lenData);
-		trim(data);
-
+		data = subString(strchr(sceltaStart, '&') + 1, strchr(sceltaStart, '&') + 1, strchr(sceltaStart, '?') + 1);
+		
 		//RECUPERO Email
-		char *posEmailInizio = strchr(sceltaStart, '?') + 1;
-		//IN QUESTO PUNTO QUI ho: posDataInizio = data?email!password
-		char *posEmailFine = strchr(sceltaStart, '!') + 1;
-		int lenEmail = (posEmailFine - posEmailInizio) - 1;
-
-		strncpy(email, posEmailInizio, lenEmail);
-		trim(email);
-
+		email = subString(strchr(sceltaStart, '?') + 1, strchr(sceltaStart, '?') + 1, strchr(sceltaStart, '!') + 1);
+		
 		//RECUPERO Password
-		char *posPasswordInizio = strchr(sceltaStart, '!') + 1;
-		//IN QUESTO PUNTO QUI ho: posDataInizio = data?email!password
-		char *posPasswordFine = strchr(sceltaStart, '\0') + 1;
-
-		
-		int lenPassword = (posPasswordFine - posPasswordInizio) - 1;
-
-		strncpy(password, posPasswordInizio, lenPassword);
-		trim(password);
+		password = subString(strchr(sceltaStart, '!') + 1, strchr(sceltaStart, '!') + 1, strchr(sceltaStart, '\0') + 1);;
 		
 
-		printf("NOME: %s \n", nomeFormattato);
+		printf("NOME: %s \n", nome);
 		printf("Cognome: %s \n", cognome);
 		printf("Data: %s \n", data);
 		printf("Email: %s \n", email);
@@ -246,6 +225,7 @@ void *thread_login(void *arg)
 		}
 
     	printf("Utente registrato con successo!\n");
+		
 
 		send(newSocket,"Registration_Successful",23,0);
 
