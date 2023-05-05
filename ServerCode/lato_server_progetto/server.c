@@ -237,7 +237,7 @@ void *thread_login(void *arg)
 		printf("Password: %s \n", password);
 
 		char query[1000];
-    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nome, cognome, data);
+    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nomeFormattato, cognome, data);
 
 		if (mysql_query(conn, query)) 
 		{
