@@ -12,6 +12,12 @@
 
 #define PORT 8080
 #define MESSAGE_SIZE 256
+char *subString(char *string, int posIniziale, int posFinale)
+{
+
+
+	return "ciao";
+}
 
 void trim(char *str)
 {
@@ -164,7 +170,90 @@ void *thread_login(void *arg)
 		
 		
 	}
+	if(sceltaStart[0]=='2') //API REGISTER
+	{
+		/*
+		Il Client manda la sequenza: nome_cognome&data?email!password
+		*/
+		char nome[100];
+		char cognome[100];
+		char data[100];
+		char email[100];
+		char password[100];
+		char nomeFormattato[100];
+		
+		//LUNGHEZZA DI TUTTO IL MESSAGGIO INVIATO
+		int lenRegister = strlen(sceltaStart) - 1;
+
+		//Recupero Nome
+		char *posNome = strchr(sceltaStart, '_');
+		int lenNome = posNome - sceltaStart;
+		strncpy(nome, sceltaStart, lenNome);
+		strcpy(nomeFormattato, nome + 1);
+		//Cancello MEMORIA? No, in locale quando la funzione viene chiusa, viene anche deallocata la memoria.
 	
+		//RECUPERO COGNOME
+		char *posCognome = strchr(sceltaStart, '_') + 1;
+		//IN QUESTO PUNTO QUI ho: cognome&data?email!password
+		int lenCognome = (posCognome - sceltaStart) + 1;
+		strncpy(cognome, posCognome, lenCognome);
+		trim(cognome);
+
+
+		//RECUPERO Data
+		char *posDataInzio = strchr(sceltaStart, '&') + 1;
+		//IN QUESTO PUNTO QUI ho: posDataInizio = data?email!password
+		char *posDataFine = strchr(sceltaStart, '?') + 1;
+		int lenData = (posDataFine - posDataInzio) - 1;
+
+		strncpy(data, posDataInzio, lenData);
+		trim(data);
+
+		//RECUPERO Email
+		char *posEmailInizio = strchr(sceltaStart, '?') + 1;
+		//IN QUESTO PUNTO QUI ho: posDataInizio = data?email!password
+		char *posEmailFine = strchr(sceltaStart, '!') + 1;
+		int lenEmail = (posEmailFine - posEmailInizio) - 1;
+
+		strncpy(email, posEmailInizio, lenEmail);
+		trim(email);
+
+		//RECUPERO Password
+		char *posPasswordInizio = strchr(sceltaStart, '!') + 1;
+		//IN QUESTO PUNTO QUI ho: posDataInizio = data?email!password
+		char *posPasswordFine = strchr(sceltaStart, '\0') + 1;
+
+		
+		int lenPassword = (posPasswordFine - posPasswordInizio) - 1;
+
+		strncpy(password, posPasswordInizio, lenPassword);
+		trim(password);
+		
+
+		printf("NOME: %s \n", nomeFormattato);
+		printf("Cognome: %s \n", cognome);
+		printf("Data: %s \n", data);
+		printf("Email: %s \n", email);
+		printf("Password: %s \n", password);
+
+		char query[1000];
+    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nome, cognome, data);
+
+		if (mysql_query(conn, query)) 
+		{
+			fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
+			exit(1);
+		}
+
+    	printf("Utente registrato con successo!\n");
+
+		send(newSocket,"Registration_Successful",23,0);
+
+
+
+	}
+
+
 	//CHIUDO CONNESSIONE
 	mysql_close(conn); 
 	//CHIUDO IL THREAD
