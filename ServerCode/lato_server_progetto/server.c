@@ -13,9 +13,19 @@
 #define PORT 8080
 #define MESSAGE_SIZE 256
 
+struct bevanda
+{
+	char *fk_oridne;
+        char *idBevanda;
+        char *quantita;
+};
+typedef struct bevanda bevandaNelCarrello[150];
+
+struct bevandaNelCarrello {
+        struct bevanda bevande[150];
+};
 
 pthread_mutex_t mutex;
-
 
 void trim(char *str);
 char *subString(char *string, char *posIniziale, char *posFinale)
@@ -31,7 +41,7 @@ char *subString(char *string, char *posIniziale, char *posFinale)
     return subString;
 }
 char *getBevande(char *idUtente, MYSQL *conn)
-{	
+{
 	char *fileJSON;
 
 	MYSQL_RES *result;
@@ -55,7 +65,7 @@ char *getBevande(char *idUtente, MYSQL *conn)
 	else
 	{
 		printf("Ecco tutte le bevande disponibili \n");
-		
+
 		while((row=mysql_fetch_row(result)) != NULL)
 		{
 			// Creazione dell'oggetto JSON
@@ -290,7 +300,7 @@ void *thread_login(void *arg)
 		free(data);
 		free(email);
 		free(password);
-<<<<<<< Updated upstream
+
 	    	printf("Utente registrato con successo!\n");
 
 		send(newSocket,"Registration_Successful",23,0);
@@ -305,11 +315,30 @@ void *thread_login(void *arg)
 		//Messaggio dal Cliente
 		//idUtente!idBevanda&quantità$tot_prezzo
 		int fk_utente;
-		int idBevanda;
-		int quantita;
+		//int idBevanda;
+		//int quantita;
 		float tot_prezzo;
 		char stato[]="confermato";
 		char *data_ordine;
+
+		//idUtente!{idBevanda, quantità}, .. , {idBevanda,quantità}$tot_prezzo;
+
+
+		//indice per il for che itera su oggetti per il carrelo
+		int i=0;
+
+		struct bevandaNelCarrello bevandaNelCarrello;
+
+		char *bevande = sceltaStart + 1;
+		while (*bevande != '$')
+		{
+    			bevande = subString(bevande, strchr(sceltaStart, '{'), strchr(sceltaStart, '}'));
+    			bevandaNelCarrello.bevande[i].idBevanda = bevande + 1;
+    			bevandaNelCarrello.bevande[i].quantita = bevande + 3;
+    			printf(" %s  %s ", bevandaNelCarrello.bevande[i].idBevanda, bevandaNelCarrello.bevande[i].quantita);
+			i++;
+		}
+
 
 		//prendo la lunghezza di tutto il messaggio arrivato dal client
 		int lenRegister = strlen(sceltaStart) - 1;
@@ -317,20 +346,21 @@ void *thread_login(void *arg)
 		//recupero id utente con funzione substring
 		fk_utente = (int) strtol(subString(strchr(sceltaStart, '4')+1, strchr(sceltaStart, '4') + 1, strchr (sceltaStart, '!') +1), (char **)NULL, 10);
 
-
+		/*
 		//recupero id bevanda con funzione substring
 		idBevanda = (int) strtol(subString(strchr(sceltaStart, '!')+1, strchr(sceltaStart, '!') +1, strchr (sceltaStart, '&') +1), (char **)NULL, 10);
 
 		//recupero quantita con funzione substring
 		quantita=(int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
+		*/
 
 		//recupero tot_prezzo con funzione substring
 		tot_prezzo = strtof(subString(sceltaStart, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0')), NULL);
 
 
 		printf("ID_UTENTE : %d \n", fk_utente);
-		printf("ID_BEVANDA : %d \n", idBevanda);
-		printf("QUANTITA' : %d \n", quantita);
+		//printf("ID_BEVANDA : %d \n", idBevanda);
+		//printf("QUANTITA' : %d \n", quantita);
 		printf("PREZZO TOTALE : %f\n", tot_prezzo);
 
 		char query[1000];
@@ -352,23 +382,7 @@ void *thread_login(void *arg)
 
 		send(newSocket,"Ordine_OKKE",11,0);
 
-
-=======
-    	printf("Utente registrato con successo!\n");
-		
-		cb
-		send(newSocket,"Registration_Successful",23,0);
-
 	}
-	if(sceltaStart[0]=='4') //CARRELLO
-	{
-		//Messaggio dal Cliente
-		// idUtente!{idBevanda,quantità}, ... , {idBevanda, quantità}$prezzo_totale;
->>>>>>> Stashed changes
-
-	}
-
-
 	//CHIUDO CONNESSIONE
 	mysql_close(conn);
 	//CHIUDO IL THREAD
