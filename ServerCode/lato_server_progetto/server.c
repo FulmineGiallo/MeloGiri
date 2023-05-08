@@ -234,8 +234,6 @@ void *thread_login(void *arg)
 
 		send(newSocket,"Registration_Successful",23,0);
 
-
-
 	}
 
 
