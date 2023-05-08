@@ -62,7 +62,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="Andrea99."; //password db
+	char *password="fulmine13"; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -240,7 +240,16 @@ void *thread_login(void *arg)
 		send(newSocket,"Registration_Successful",23,0);
 
 	}
+	if(sceltaStart[0]=='3')
+	{
+		
+	}
+	if(sceltaStart[0]=='4') //CARRELLO
+	{
+		//Messaggio dal Cliente
+		// idUtente!idBevanda&quantità$tot_prezzo
 
+	}
 
 	//CHIUDO CONNESSIONE
 	mysql_close(conn); 
