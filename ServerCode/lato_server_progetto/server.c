@@ -18,7 +18,6 @@ pthread_mutex_t mutex;
 
 
 void trim(char *str);
-
 char *subString(char *string, char *posIniziale, char *posFinale)
 {
     int len = (posFinale - posIniziale) - 1;
@@ -31,6 +30,59 @@ char *subString(char *string, char *posIniziale, char *posFinale)
 
     return subString;
 }
+char *getBevande(char *idUtente, MYSQL *conn)
+{	
+	char *fileJSON;
+
+	MYSQL_RES *result;
+	MYSQL_ROW row;
+	char query[100];
+	sprintf(query, "SELECT * FROM bevanda");
+
+	if(mysql_query(conn,query))
+	{
+		fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
+		exit(1);
+	}
+	result = mysql_store_result(conn);
+
+	if(mysql_num_rows(result)==0)
+	{
+		printf("Non ci sono bevande disponibili! \n");
+		mysql_free_result(result);
+		mysql_close(conn);
+	}
+	else
+	{
+		printf("Ecco tutte le bevande disponibili \n");
+		
+		while((row=mysql_fetch_row(result)) != NULL)
+		{
+			// Creazione dell'oggetto JSON
+			cJSON *root = cJSON_CreateObject();
+			cJSON_AddStringToObject(root, "idbevanda", row[0]);
+			cJSON_AddStringToObject(root, "nome", row[1]);
+			cJSON_AddStringToObject(root, "photo_url", row[2]);
+			cJSON_AddStringToObject(root, "livello_alcolico", row[3]);
+			cJSON_AddStringToObject(root, "descrizione", row[4]);
+			cJSON_AddStringToObject(root, "categoria", row[5]);
+			cJSON_AddStringToObject(root, "prezzo", row[6]);
+
+			fileJSON = cJSON_Print(root);
+
+			// Liberazione della memoria dell'oggetto JSON e della stringa JSON
+			cJSON_Delete(root);
+			//free(fileJSON);
+		}
+
+
+	}
+	
+	mysql_free_result(result);
+	return fileJSON;
+	
+}
+
 
 void trim(char *str)
 {
@@ -179,6 +231,11 @@ void *thread_login(void *arg)
 				free(json_str);
 			}
 
+			//GENERO LE BEVANDE
+			char *fileJSON = getBevande(row[0], conn);
+			send(newSocket, fileJSON, strlen(fileJSON), 0);
+			free(fileJSON);
+
 			mysql_free_result(result);
 		}
 	}
@@ -233,6 +290,7 @@ void *thread_login(void *arg)
 		free(data);
 		free(email);
 		free(password);
+<<<<<<< Updated upstream
 	    	printf("Utente registrato con successo!\n");
 
 		send(newSocket,"Registration_Successful",23,0);
@@ -295,6 +353,18 @@ void *thread_login(void *arg)
 		send(newSocket,"Ordine_OKKE",11,0);
 
 
+=======
+    	printf("Utente registrato con successo!\n");
+		
+		cb
+		send(newSocket,"Registration_Successful",23,0);
+
+	}
+	if(sceltaStart[0]=='4') //CARRELLO
+	{
+		//Messaggio dal Cliente
+		// idUtente!{idBevanda,quantità}, ... , {idBevanda, quantità}$prezzo_totale;
+>>>>>>> Stashed changes
 
 	}
 
