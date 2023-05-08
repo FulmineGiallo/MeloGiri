@@ -224,6 +224,11 @@ void *thread_login(void *arg)
 			exit(1);
 		}
 
+		free(nome);
+		free(cognome);
+		free(data);
+		free(email);
+		free(password);
     	printf("Utente registrato con successo!\n");
 		
 
