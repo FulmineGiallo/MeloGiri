@@ -49,6 +49,7 @@ void trim(char *str)
         i--;
     }
 }
+
 //creo un thread per la gestione di connessione e query mysql. questo script andrà inserito all'interno della socket del server
 void *thread_login(void *arg)
 {
@@ -62,18 +63,18 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="fulmine13"; //password db
+	char *password="Andrea99."; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
 	conn=mysql_init(NULL);
-	
+
 	if(!mysql_real_connect(conn,server,username,password,database,0,NULL,0))
 	{
 		fprintf(stderr, "%s\n", mysql_error(conn));
 		exit(1);
 	}
-	else 
+	else
 		printf("Connessione avvenuta al DATABASE \n");
 
 	char *message; //Messaggio che ricevo dal client
@@ -109,13 +110,13 @@ void *thread_login(void *arg)
     }
     while(bytesRecv == 0);
 
-	
+
 	if(sceltaStart[0]=='1') //API LOGIN
 	{
 		//FORMATO RICHIESTA: 1carminefb@live.it&$password
 		char email[100];
 		char pswd[100];
-		char emailFormattata[100]; 
+		char emailFormattata[100];
 		char passwordFormattata[100];
 
 		printf("EMAIL + PASSWORD : %s \n", sceltaStart);
@@ -126,20 +127,20 @@ void *thread_login(void *arg)
 		strncpy(email, sceltaStart, len);
 		strcpy(emailFormattata, email + 1);
 
-		
+
 		//Pulizia memoria stringhe
 		//strcpy(email, "");
 
 		//RECUPERO PASSWORD da SceltaStart
 		int lenLogin = strlen(sceltaStart) - 1;
 		char *posPassword = strchr(sceltaStart, '$');
-	
+
 		int lenPassword = (posPassword - sceltaStart) + 1;
 		strcpy(passwordFormattata, posPassword + 1);
 
 		trim(passwordFormattata);
 		sprintf(query, "SELECT * FROM utente WHERE email = '%s' && password = '%s';", emailFormattata,passwordFormattata);
-		//verifico credenziali di accesso 
+		//verifico credenziali di accesso
 		MYSQL_RES *result;
 		MYSQL_ROW row;
 
@@ -149,7 +150,7 @@ void *thread_login(void *arg)
 			exit(1);
 		}
 		result = mysql_store_result(conn);
-	
+
 		if(mysql_num_rows(result)==0)
 		{
 			printf("Credenziali di accesso non valide \n");
@@ -160,7 +161,7 @@ void *thread_login(void *arg)
 		else
 		{
 			printf("Accesso consentito\n");
-			
+
 			while((row=mysql_fetch_row(result)) != NULL)
 			{
 				 // Creazione dell'oggetto JSON
@@ -180,9 +181,8 @@ void *thread_login(void *arg)
 
 			mysql_free_result(result);
 		}
-		
-		
 	}
+
 	if(sceltaStart[0]=='2') //API REGISTER
 	{
 		/*
@@ -193,8 +193,7 @@ void *thread_login(void *arg)
 		char *data;
 		char *email;
 		char *password;
-		
-		
+
 		//LUNGHEZZA DI TUTTO IL MESSAGGIO INVIATO
 		int lenRegister = strlen(sceltaStart) - 1;
 
@@ -206,13 +205,13 @@ void *thread_login(void *arg)
 
 		//RECUPERO Data
 		data = subString(strchr(sceltaStart, '&') + 1, strchr(sceltaStart, '&') + 1, strchr(sceltaStart, '?') + 1);
-		
+
 		//RECUPERO Email
 		email = subString(strchr(sceltaStart, '?') + 1, strchr(sceltaStart, '?') + 1, strchr(sceltaStart, '!') + 1);
-		
+
 		//RECUPERO Password
-		password = subString(strchr(sceltaStart, '!') + 1, strchr(sceltaStart, '!') + 1, strchr(sceltaStart, '\0') + 1);;
-		
+		password = subString(strchr(sceltaStart, '!') + 1, strchr(sceltaStart, '!') + 1, strchr(sceltaStart, '\0') + 1);
+
 
 		printf("NOME: %s \n", nome);
 		printf("Cognome: %s \n", cognome);
@@ -221,9 +220,9 @@ void *thread_login(void *arg)
 		printf("Password: %s \n", password);
 
 		char query[1000];
-    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nome, cognome, data);
+	    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nome, cognome, data);
 
-		if (mysql_query(conn, query)) 
+		if (mysql_query(conn, query))
 		{
 			fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
 			exit(1);
@@ -234,28 +233,76 @@ void *thread_login(void *arg)
 		free(data);
 		free(email);
 		free(password);
-    	printf("Utente registrato con successo!\n");
-		
+	    	printf("Utente registrato con successo!\n");
 
 		send(newSocket,"Registration_Successful",23,0);
 
 	}
 	if(sceltaStart[0]=='3')
 	{
-		
+
 	}
 	if(sceltaStart[0]=='4') //CARRELLO
 	{
 		//Messaggio dal Cliente
-		// idUtente!idBevanda&quantità$tot_prezzo
+		//idUtente!idBevanda&quantità$tot_prezzo
+		int fk_utente;
+		int idBevanda;
+		int quantita;
+		float tot_prezzo;
+		char stato[]="confermato";
+		char *data_ordine;
+
+		//prendo la lunghezza di tutto il messaggio arrivato dal client
+		int lenRegister = strlen(sceltaStart) - 1;
+
+		//recupero id utente con funzione substring
+		fk_utente = (int) strtol(subString(strchr(sceltaStart, '4')+1, strchr(sceltaStart, '4') + 1, strchr (sceltaStart, '!') +1), (char **)NULL, 10);
+
+
+		//recupero id bevanda con funzione substring
+		idBevanda = (int) strtol(subString(strchr(sceltaStart, '!')+1, strchr(sceltaStart, '!') +1, strchr (sceltaStart, '&') +1), (char **)NULL, 10);
+
+		//recupero quantita con funzione substring
+		quantita=(int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
+
+		//recupero tot_prezzo con funzione substring
+		tot_prezzo = strtof(subString(sceltaStart, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0')), NULL);
+
+
+		printf("ID_UTENTE : %d \n", fk_utente);
+		printf("ID_BEVANDA : %d \n", idBevanda);
+		printf("QUANTITA' : %d \n", quantita);
+		printf("PREZZO TOTALE : %f\n", tot_prezzo);
+
+		char query[1000];
+
+		//prima query= insert ordine
+		//seconda query= insert carrello da ordine
+
+
+		//query ordine
+		sprintf(query, "INSERT INTO ordine (stato, data_ordine,fk_utente,tot_prezzo) VALUES ('%s','%s','%d','%f');", stato, data_ordine, fk_utente, tot_prezzo);
+
+		if (mysql_query(conn, query))
+                {
+                        fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
+                        exit(1);
+                }
+
+		printf("Ordine registrato\n");
+
+		send(newSocket,"Ordine_OKKE",11,0);
+
+
 
 	}
 
+
 	//CHIUDO CONNESSIONE
-	mysql_close(conn); 
+	mysql_close(conn);
 	//CHIUDO IL THREAD
 	pthread_exit(NULL);
-	
 }
 
 int main()
