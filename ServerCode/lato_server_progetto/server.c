@@ -12,6 +12,11 @@
 
 #define PORT 8080
 #define MESSAGE_SIZE 256
+
+
+pthread_mutex_t mutex;
+
+
 void trim(char *str);
 
 char *subString(char *string, char *posIniziale, char *posFinale)
@@ -57,7 +62,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="fulmine13"; //password db
+	char *password="Andrea99."; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -216,7 +221,7 @@ void *thread_login(void *arg)
 		printf("Password: %s \n", password);
 
 		char query[1000];
-    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nomeFormattato, cognome, data);
+    	sprintf(query, "INSERT INTO utente (email, password, nome, cognome, data_nascita) VALUES ('%s', '%s', '%s', '%s', '%s');", email, password, nome, cognome, data);
 
 		if (mysql_query(conn, query)) 
 		{
@@ -292,6 +297,7 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
+	pthread_mutex_init(&mutex, NULL);
 	pthread_t tid;
 	int res;
 
@@ -303,10 +309,11 @@ int main()
 			perror("Errore nell'accettazione della connessione in entrata");
 			exit(EXIT_FAILURE);
 		}
-		
-		
+
+		pthread_mutex_lock(&mutex);
+
 		res=pthread_create(&tid,NULL,thread_login,&client_fd);
-		
+
 		if(res)
 		{
 			printf("Errore creating thread: %d\n", res);
@@ -314,6 +321,8 @@ int main()
 		}
 
 		pthread_join(tid,NULL);
+
+		pthread_mutex_unlock(&mutex);
 	}
 	
  	close(client_fd);
