@@ -300,20 +300,43 @@ void *thread_login(void *arg)
 		free(data);
 		free(email);
 		free(password);
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	    	printf("Utente registrato con successo!\n");
 
 		send(newSocket,"Registration_Successful",23,0);
 
 	}
-	if(sceltaStart[0]=='3')
-	{
-
-	}
 	if(sceltaStart[0]=='4') //CARRELLO
 	{
 		//Messaggio dal Cliente
-		//idUtente!idBevanda&quantità$tot_prezzo
+		//idUtente!{idBevanda, quantità}, .. , {idBevanda,quantità}$tot_prezzo;
+		/*
+			2!{3,5},{4,6},{2,44}$344949;
+			subString(START, !); --> {3,5},{4,6},{2,44}$344949;
+			subString({, }) --> {4,6},{2,44}$344949;
+			..
+			--> $344949;
+		*/
+		int i = 0;
+		
+		char *bevande = sceltaStart + 1;
+		while(bevande != '$')
+		{
+			bevande = subString(bevande, strchr(sceltaStart, '{'), strchr(sceltaStart, '}'));
+			idBevanda[i] = bevande + 1;
+			quantità[i] = bevande + 3;
+
+
+	
+			i++;
+
+		}
+		//RECUPERO TOT_PREZZO;
+
+
 		int fk_utente;
 		//int idBevanda;
 		//int quantita;
@@ -346,13 +369,20 @@ void *thread_login(void *arg)
 		//recupero id utente con funzione substring
 		fk_utente = (int) strtol(subString(strchr(sceltaStart, '4')+1, strchr(sceltaStart, '4') + 1, strchr (sceltaStart, '!') +1), (char **)NULL, 10);
 
+<<<<<<< Updated upstream
 		/*
+=======
+>>>>>>> Stashed changes
 		//recupero id bevanda con funzione substring
 		idBevanda = (int) strtol(subString(strchr(sceltaStart, '!')+1, strchr(sceltaStart, '!') +1, strchr (sceltaStart, '&') +1), (char **)NULL, 10);
 
 		//recupero quantita con funzione substring
+<<<<<<< Updated upstream
 		quantita=(int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
 		*/
+=======
+		quantita = (int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
+>>>>>>> Stashed changes
 
 		//recupero tot_prezzo con funzione substring
 		tot_prezzo = strtof(subString(sceltaStart, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0')), NULL);
@@ -373,16 +403,24 @@ void *thread_login(void *arg)
 		sprintf(query, "INSERT INTO ordine (stato, data_ordine,fk_utente,tot_prezzo) VALUES ('%s','%s','%d','%f');", stato, data_ordine, fk_utente, tot_prezzo);
 
 		if (mysql_query(conn, query))
-                {
-                        fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
-                        exit(1);
-                }
+		{
+				fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
+				exit(1);
+		}
 
 		printf("Ordine registrato\n");
 
 		send(newSocket,"Ordine_OKKE",11,0);
 
+<<<<<<< Updated upstream
 	}
+=======
+
+
+	}
+
+
+>>>>>>> Stashed changes
 	//CHIUDO CONNESSIONE
 	mysql_close(conn);
 	//CHIUDO IL THREAD
