@@ -13,18 +13,6 @@
 #define PORT 8080
 #define MESSAGE_SIZE 256
 
-struct bevanda
-{
-	char *fk_oridne;
-        char *idBevanda;
-        char *quantita;
-};
-typedef struct bevanda bevandaNelCarrello[150];
-
-struct bevandaNelCarrello {
-        struct bevanda bevande[150];
-};
-
 pthread_mutex_t mutex;
 
 
@@ -42,7 +30,7 @@ char *subString(char *string, char *posIniziale, char *posFinale)
     return subString;
 }
 char *getBevande(char *idUtente, MYSQL *conn)
-{	
+{
 	char *fileJSON;
 
 	MYSQL_RES *result;
@@ -66,7 +54,7 @@ char *getBevande(char *idUtente, MYSQL *conn)
 	else
 	{
 		printf("Ecco tutte le bevande disponibili \n");
-		
+
 		while((row=mysql_fetch_row(result)) != NULL)
 		{
 			// Creazione dell'oggetto JSON
@@ -88,10 +76,10 @@ char *getBevande(char *idUtente, MYSQL *conn)
 
 
 	}
-	
+
 	mysql_free_result(result);
 	return fileJSON;
-	
+
 }
 void trim(char *str)
 {
@@ -124,7 +112,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="fulmine13"; //password db
+	char *password="Andrea99."; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -298,7 +286,7 @@ void *thread_login(void *arg)
 		free(data);
 		free(email);
 		free(password);
-	    printf("Utente registrato con successo!\n");
+	  	printf("Utente registrato con successo!\n");
 
 		send(newSocket,"Registration_Successful",23,0);
 
@@ -313,24 +301,27 @@ void *thread_login(void *arg)
 			subString({, }) --> {4,6},{2,44}$344949;
 			..
 			--> $344949;
-		*/
-		
-	
+
+
+		char *bevande=sceltaStart+1;
+
+
 		printf("MESSAGGIO CLIENT: %s", bevande);
-		char *p = sceltaStart + 1;
+		char *p = bevande;
 		char *sub;
-		char *tot_prezzo;
+		//char *tot_prezzo;
 		int idBevanda2[20];
 		int quantita2[20];
-	
+
 		char *idBevandaP;
 		char *quantitaBevanda;
+		/*
 		while ((p = strchr(p, '{')) != NULL) 
 		{
-			
+
 			sub = subString(bevande, p + 1, strchr(p, '}') + 1);
 
-		
+
 			printf("%s \n", sub);
 			idBevandaP = subString(sub, sub, strchr(sub, ',') + 1);
 			quantitaBevanda = subString(sub,strchr(sub,',') + 1, strchr(sub, '\0') + 1);
@@ -338,49 +329,52 @@ void *thread_login(void *arg)
 			printf("ID: %s \n", idBevandaP);
 			printf("QUANTITA: %s \n", quantitaBevanda);
 
-			//idBevanda2[i] = atoi(subString(sub, sub, strchr(sub, ',')));
+			char query[1000];
+
+			sprintf(query, "INSERT INTO carrello (fk_ordine, fk_bevanda, quantita_bevanda) VALUES (LAST_INSERT_ID(), %d, %d)",atoi(idBevandaP), atoi(quantitaBevanda));
+			if (mysql_query(conn, query))
+   			{
+       				fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
+        			exit(1);
+    			}
 
 			free(sub);
 			p++;
-	
+
 		}
+
+		free(idBevandaP);
+		free(quantitaBevanda);
 
 		printf("MESSAGGIO CLIENT CON FORMATTAZIONE: %s \n", bevande);
 		//RECUPERO TOT_PREZZO;
 		tot_prezzo = subString(strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0') + 1);
 		printf("TOT PREZZO: %s \n", tot_prezzo);
 		printf("PRIMO VALORE: %d \n", idBevanda2[0]);
-
+		*/
 		int fk_utente;
 		int idBevanda;
 		int quantita;
-		//float tot_prezzo;
+		float tot_prezzo;
 		char stato[]="confermato";
 		char *data_ordine;
 
-		/*
-		
+
+
 		//prendo la lunghezza di tutto il messaggio arrivato dal client
 		int lenRegister = strlen(sceltaStart) - 1;
 
 		//recupero id utente con funzione substring
 		fk_utente = (int) strtol(subString(strchr(sceltaStart, '4')+1, strchr(sceltaStart, '4') + 1, strchr (sceltaStart, '!') +1), (char **)NULL, 10);
 
-		//recupero id bevanda con funzione substring
-		idBevanda = (int) strtol(subString(strchr(sceltaStart, '!')+1, strchr(sceltaStart, '!') +1, strchr (sceltaStart, '&') +1), (char **)NULL, 10);
-
-		//recupero quantita con funzione substring
-		quantita = (int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
-
 		//recupero tot_prezzo con funzione substring
-		tot_prezzo = strtof(subString(sceltaStart, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0')), NULL);
-
+		tot_prezzo = strtof(subString(strchr(sceltaStart, '$'), strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0') + 1), NULL);
 
 		printf("ID_UTENTE : %d \n", fk_utente);
 		printf("ID_BEVANDA : %d \n", idBevanda);
 		printf("QUANTITA' : %d \n", quantita);
 		printf("PREZZO TOTALE : %f\n", tot_prezzo);
-		
+
 		char query[1000];
 
 		//prima query= insert ordine
@@ -395,8 +389,11 @@ void *thread_login(void *arg)
 				fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
 				exit(1);
 		}
-		*/
-		printf("Ordine registrato\n");
+
+		// recupero l'id dell'ordine appena inserito
+		int id_ordine = mysql_insert_id(conn);
+
+		printf("Ordine registrato con id %d\n", id_ordine);
 
 		send(newSocket,"Ordine_OKKE",11,0);
 
