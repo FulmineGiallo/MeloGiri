@@ -27,6 +27,7 @@ struct bevandaNelCarrello {
 
 pthread_mutex_t mutex;
 
+
 void trim(char *str);
 char *subString(char *string, char *posIniziale, char *posFinale)
 {
@@ -41,7 +42,7 @@ char *subString(char *string, char *posIniziale, char *posFinale)
     return subString;
 }
 char *getBevande(char *idUtente, MYSQL *conn)
-{
+{	
 	char *fileJSON;
 
 	MYSQL_RES *result;
@@ -65,7 +66,7 @@ char *getBevande(char *idUtente, MYSQL *conn)
 	else
 	{
 		printf("Ecco tutte le bevande disponibili \n");
-
+		
 		while((row=mysql_fetch_row(result)) != NULL)
 		{
 			// Creazione dell'oggetto JSON
@@ -92,8 +93,6 @@ char *getBevande(char *idUtente, MYSQL *conn)
 	return fileJSON;
 	
 }
-
-
 void trim(char *str)
 {
     int len = strlen(str);
@@ -125,7 +124,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="Andrea99."; //password db
+	char *password="fulmine13"; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -249,7 +248,6 @@ void *thread_login(void *arg)
 			mysql_free_result(result);
 		}
 	}
-
 	if(sceltaStart[0]=='2') //API REGISTER
 	{
 		/*
@@ -300,11 +298,7 @@ void *thread_login(void *arg)
 		free(data);
 		free(email);
 		free(password);
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
-	    	printf("Utente registrato con successo!\n");
+	    printf("Utente registrato con successo!\n");
 
 		send(newSocket,"Registration_Successful",23,0);
 
@@ -320,79 +314,73 @@ void *thread_login(void *arg)
 			..
 			--> $344949;
 		*/
-		int i = 0;
 		
-		char *bevande = sceltaStart + 1;
-		while(bevande != '$')
-		{
-			bevande = subString(bevande, strchr(sceltaStart, '{'), strchr(sceltaStart, '}'));
-			idBevanda[i] = bevande + 1;
-			quantità[i] = bevande + 3;
-
-
 	
-			i++;
+		printf("MESSAGGIO CLIENT: %s", bevande);
+		char *p = sceltaStart + 1;
+		char *sub;
+		char *tot_prezzo;
+		int idBevanda2[20];
+		int quantita2[20];
+	
+		char *idBevandaP;
+		char *quantitaBevanda;
+		while ((p = strchr(p, '{')) != NULL) 
+		{
+			
+			sub = subString(bevande, p + 1, strchr(p, '}') + 1);
 
+		
+			printf("%s \n", sub);
+			idBevandaP = subString(sub, sub, strchr(sub, ',') + 1);
+			quantitaBevanda = subString(sub,strchr(sub,',') + 1, strchr(sub, '\0') + 1);
+
+			printf("ID: %s \n", idBevandaP);
+			printf("QUANTITA: %s \n", quantitaBevanda);
+
+			//idBevanda2[i] = atoi(subString(sub, sub, strchr(sub, ',')));
+
+			free(sub);
+			p++;
+	
 		}
-		//RECUPERO TOT_PREZZO;
 
+		printf("MESSAGGIO CLIENT CON FORMATTAZIONE: %s \n", bevande);
+		//RECUPERO TOT_PREZZO;
+		tot_prezzo = subString(strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0') + 1);
+		printf("TOT PREZZO: %s \n", tot_prezzo);
+		printf("PRIMO VALORE: %d \n", idBevanda2[0]);
 
 		int fk_utente;
-		//int idBevanda;
-		//int quantita;
-		float tot_prezzo;
+		int idBevanda;
+		int quantita;
+		//float tot_prezzo;
 		char stato[]="confermato";
 		char *data_ordine;
 
-		//idUtente!{idBevanda, quantità}, .. , {idBevanda,quantità}$tot_prezzo;
-
-
-		//indice per il for che itera su oggetti per il carrelo
-		int i=0;
-
-		struct bevandaNelCarrello bevandaNelCarrello;
-
-		char *bevande = sceltaStart + 1;
-		while (*bevande != '$')
-		{
-    			bevande = subString(bevande, strchr(sceltaStart, '{'), strchr(sceltaStart, '}'));
-    			bevandaNelCarrello.bevande[i].idBevanda = bevande + 1;
-    			bevandaNelCarrello.bevande[i].quantita = bevande + 3;
-    			printf(" %s  %s ", bevandaNelCarrello.bevande[i].idBevanda, bevandaNelCarrello.bevande[i].quantita);
-			i++;
-		}
-
-
+		/*
+		
 		//prendo la lunghezza di tutto il messaggio arrivato dal client
 		int lenRegister = strlen(sceltaStart) - 1;
 
 		//recupero id utente con funzione substring
 		fk_utente = (int) strtol(subString(strchr(sceltaStart, '4')+1, strchr(sceltaStart, '4') + 1, strchr (sceltaStart, '!') +1), (char **)NULL, 10);
 
-<<<<<<< Updated upstream
-		/*
-=======
->>>>>>> Stashed changes
 		//recupero id bevanda con funzione substring
 		idBevanda = (int) strtol(subString(strchr(sceltaStart, '!')+1, strchr(sceltaStart, '!') +1, strchr (sceltaStart, '&') +1), (char **)NULL, 10);
 
 		//recupero quantita con funzione substring
-<<<<<<< Updated upstream
-		quantita=(int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
-		*/
-=======
 		quantita = (int) strtol(subString(strchr(sceltaStart, '&')+1, strchr(sceltaStart, '&') +1, strchr (sceltaStart, '$') +1), (char **)NULL, 10);
->>>>>>> Stashed changes
 
 		//recupero tot_prezzo con funzione substring
 		tot_prezzo = strtof(subString(sceltaStart, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0')), NULL);
 
 
 		printf("ID_UTENTE : %d \n", fk_utente);
-		//printf("ID_BEVANDA : %d \n", idBevanda);
-		//printf("QUANTITA' : %d \n", quantita);
+		printf("ID_BEVANDA : %d \n", idBevanda);
+		printf("QUANTITA' : %d \n", quantita);
 		printf("PREZZO TOTALE : %f\n", tot_prezzo);
-
+		
 		char query[1000];
 
 		//prima query= insert ordine
@@ -407,20 +395,16 @@ void *thread_login(void *arg)
 				fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
 				exit(1);
 		}
-
+		*/
 		printf("Ordine registrato\n");
 
 		send(newSocket,"Ordine_OKKE",11,0);
 
-<<<<<<< Updated upstream
-	}
-=======
 
 
 	}
 
 
->>>>>>> Stashed changes
 	//CHIUDO CONNESSIONE
 	mysql_close(conn);
 	//CHIUDO IL THREAD
