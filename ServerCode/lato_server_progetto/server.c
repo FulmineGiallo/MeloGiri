@@ -17,6 +17,8 @@ pthread_mutex_t mutex;
 
 
 void trim(char *str);
+
+
 char *subString(char *string, char *posIniziale, char *posFinale)
 {
     int len = (posFinale - posIniziale) - 1;
@@ -29,6 +31,8 @@ char *subString(char *string, char *posIniziale, char *posFinale)
 
     return subString;
 }
+
+
 char *getBevande(char *idUtente, MYSQL *conn)
 {
 	char *fileJSON;
@@ -332,7 +336,7 @@ void *thread_login(void *arg)
 
 
 		//query ordine
-		sprintf(query, "INSERT INTO ordine (stato, data_ordine,fk_utente,tot_prezzo) VALUES ('%s','%s','%d','%f');", "confermato", data_ordine, fk_utente, tot_prezzo);
+		sprintf(query, "INSERT INTO ordine (stato, data_ordine,fk_utente,tot_prezzo) VALUES ('%s',NOW(),'%d','%f');", "confermato", fk_utente, tot_prezzo);
 
 		if (mysql_query(conn, query))
 		{
@@ -348,8 +352,7 @@ void *thread_login(void *arg)
 		char *bevande=sceltaStart+1;
                 printf("MESSAGGIO CLIENT: %s", bevande);
                 char *p = bevande;
-                char *sub;
-
+                char *sub; //sottostringa risultante
                 char *idBevandaP;
                 char *quantitaBevanda;
 
