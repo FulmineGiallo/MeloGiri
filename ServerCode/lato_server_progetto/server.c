@@ -112,7 +112,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="Andrea99."; //password db
+	char *password="fulmine13"; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -301,21 +301,16 @@ void *thread_login(void *arg)
 			subString({, }) --> {4,6},{2,44}$344949;
 			..
 			--> $344949;
-
+		*/
 
 		char *bevande=sceltaStart+1;
-
-
 		printf("MESSAGGIO CLIENT: %s", bevande);
 		char *p = bevande;
 		char *sub;
-		//char *tot_prezzo;
-		int idBevanda2[20];
-		int quantita2[20];
 
 		char *idBevandaP;
 		char *quantitaBevanda;
-		/*
+		
 		while ((p = strchr(p, '{')) != NULL) 
 		{
 
@@ -347,16 +342,12 @@ void *thread_login(void *arg)
 		free(quantitaBevanda);
 
 		printf("MESSAGGIO CLIENT CON FORMATTAZIONE: %s \n", bevande);
-		//RECUPERO TOT_PREZZO;
-		tot_prezzo = subString(strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0') + 1);
-		printf("TOT PREZZO: %s \n", tot_prezzo);
-		printf("PRIMO VALORE: %d \n", idBevanda2[0]);
-		*/
+				
+	
 		int fk_utente;
 		int idBevanda;
 		int quantita;
-		float tot_prezzo;
-		char stato[]="confermato";
+		double tot_prezzo;
 		char *data_ordine;
 
 
@@ -368,7 +359,7 @@ void *thread_login(void *arg)
 		fk_utente = (int) strtol(subString(strchr(sceltaStart, '4')+1, strchr(sceltaStart, '4') + 1, strchr (sceltaStart, '!') +1), (char **)NULL, 10);
 
 		//recupero tot_prezzo con funzione substring
-		tot_prezzo = strtof(subString(strchr(sceltaStart, '$'), strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0') + 1), NULL);
+		tot_prezzo = strtod(subString(strchr(sceltaStart, '$'), strchr(sceltaStart, '$') + 1, strchr(sceltaStart, '\0') + 1), NULL);
 
 		printf("ID_UTENTE : %d \n", fk_utente);
 		printf("ID_BEVANDA : %d \n", idBevanda);
@@ -382,7 +373,7 @@ void *thread_login(void *arg)
 
 
 		//query ordine
-		sprintf(query, "INSERT INTO ordine (stato, data_ordine,fk_utente,tot_prezzo) VALUES ('%s','%s','%d','%f');", stato, data_ordine, fk_utente, tot_prezzo);
+		sprintf(query, "INSERT INTO ordine (stato, data_ordine,fk_utente,tot_prezzo) VALUES ('%s','%s','%d','%f');", "confermato", data_ordine, fk_utente, tot_prezzo);
 
 		if (mysql_query(conn, query))
 		{
@@ -396,8 +387,6 @@ void *thread_login(void *arg)
 		printf("Ordine registrato con id %d\n", id_ordine);
 
 		send(newSocket,"Ordine_OKKE",11,0);
-
-
 
 	}
 
