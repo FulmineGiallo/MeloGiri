@@ -215,6 +215,7 @@ void *thread_login(void *arg)
 			{
 				 // Creazione dell'oggetto JSON
 				cJSON *root = cJSON_CreateObject();
+				cJSON_AddStringToObject(root,"idutente", row[0]);
 				cJSON_AddStringToObject(root, "nome", row[1]);
 				cJSON_AddStringToObject(root, "cognome", row[2]);
 				cJSON_AddStringToObject(root, "data_di_nascita", row[3]);
@@ -222,7 +223,7 @@ void *thread_login(void *arg)
 				cJSON_AddStringToObject(root, "password", row[5]);
 				char *json_str = cJSON_Print(root);
 
-				//send(newSocket, json_str, strlen(json_str), 0);
+				send(newSocket, json_str, strlen(json_str), 0);
 				// Liberazione della memoria dell'oggetto JSON e della stringa JSON
 				cJSON_Delete(root);
 				free(json_str);
@@ -230,7 +231,7 @@ void *thread_login(void *arg)
 
 			//GENERO LE BEVANDE
 			fileJSON = getBevande(conn);
-			send(newSocket, fileJSON, strlen(fileJSON), 0);
+			//send(newSocket, fileJSON, strlen(fileJSON), 0);
 			
 
 			mysql_free_result(result);
