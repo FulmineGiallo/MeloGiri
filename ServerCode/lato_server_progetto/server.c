@@ -112,7 +112,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="fulmine13"; //password db
+	char *password="Andrea99."; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -303,47 +303,6 @@ void *thread_login(void *arg)
 			--> $344949;
 		*/
 
-		char *bevande=sceltaStart+1;
-		printf("MESSAGGIO CLIENT: %s", bevande);
-		char *p = bevande;
-		char *sub;
-
-		char *idBevandaP;
-		char *quantitaBevanda;
-		
-		while ((p = strchr(p, '{')) != NULL) 
-		{
-
-			sub = subString(bevande, p + 1, strchr(p, '}') + 1);
-
-
-			printf("%s \n", sub);
-			idBevandaP = subString(sub, sub, strchr(sub, ',') + 1);
-			quantitaBevanda = subString(sub,strchr(sub,',') + 1, strchr(sub, '\0') + 1);
-
-			printf("ID: %s \n", idBevandaP);
-			printf("QUANTITA: %s \n", quantitaBevanda);
-
-			char query[1000];
-
-			sprintf(query, "INSERT INTO carrello (fk_ordine, fk_bevanda, quantita_bevanda) VALUES (LAST_INSERT_ID(), %d, %d)",atoi(idBevandaP), atoi(quantitaBevanda));
-			if (mysql_query(conn, query))
-   			{
-       				fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
-        			exit(1);
-    			}
-
-			free(sub);
-			p++;
-
-		}
-
-		free(idBevandaP);
-		free(quantitaBevanda);
-
-		printf("MESSAGGIO CLIENT CON FORMATTAZIONE: %s \n", bevande);
-				
-	
 		int fk_utente;
 		int idBevanda;
 		int quantita;
@@ -385,6 +344,44 @@ void *thread_login(void *arg)
 		int id_ordine = mysql_insert_id(conn);
 
 		printf("Ordine registrato con id %d\n", id_ordine);
+
+		char *bevande=sceltaStart+1;
+                printf("MESSAGGIO CLIENT: %s", bevande);
+                char *p = bevande;
+                char *sub;
+
+                char *idBevandaP;
+                char *quantitaBevanda;
+
+                while ((p = strchr(p, '{')) != NULL)
+                {
+
+                        sub = subString(bevande, p + 1, strchr(p, '}') + 1);
+
+
+                        printf("%s \n", sub);
+                        idBevandaP = subString(sub, sub, strchr(sub, ',') + 1);
+                        quantitaBevanda = subString(sub,strchr(sub,',') + 1, strchr(sub, '\0') + 1);
+
+                        printf("ID: %s \n", idBevandaP);
+                        printf("QUANTITA: %s \n", quantitaBevanda);
+
+                        char query[1000];
+
+                        sprintf(query, "INSERT INTO carrello (fk_ordine, fk_bevanda, quantita_bevanda) VALUES (%d, %d, %d)",id_ordine, atoi(idBevandaP), atoi(quantitaBevanda));
+                        if (mysql_query(conn, query))
+                        {
+                                fprintf(stderr, "Errore nell'esecuzione della query: %s\n", mysql_error(conn));
+                                exit(1);
+                        }
+
+                        free(sub);
+                        p++;
+
+                }
+
+                free(idBevandaP);
+                free(quantitaBevanda);
 
 		send(newSocket,"Ordine_OKKE",11,0);
 
