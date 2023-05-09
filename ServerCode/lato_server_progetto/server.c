@@ -33,7 +33,7 @@ char *subString(char *string, char *posIniziale, char *posFinale)
 }
 
 
-char *getBevande(char *idUtente, MYSQL *conn)
+char *getBevande(MYSQL *conn)
 {
 	char *fileJSON;
 
@@ -59,31 +59,30 @@ char *getBevande(char *idUtente, MYSQL *conn)
 	{
 		printf("Ecco tutte le bevande disponibili \n");
 
-		while((row=mysql_fetch_row(result)) != NULL)
+		cJSON *root = cJSON_CreateArray(); // crea un array JSON per contenere i risultati
+
+		while ((row = mysql_fetch_row(result)) != NULL)
 		{
-			// Creazione dell'oggetto JSON
-			cJSON *root = cJSON_CreateObject();
-			cJSON_AddStringToObject(root, "idbevanda", row[0]);
-			cJSON_AddStringToObject(root, "nome", row[1]);
-			cJSON_AddStringToObject(root, "photo_url", row[2]);
-			cJSON_AddStringToObject(root, "livello_alcolico", row[3]);
-			cJSON_AddStringToObject(root, "descrizione", row[4]);
-			cJSON_AddStringToObject(root, "categoria", row[5]);
-			cJSON_AddStringToObject(root, "prezzo", row[6]);
+			// Crea un oggetto JSON per la riga corrente
+			cJSON *bevanda = cJSON_CreateObject();
+			cJSON_AddStringToObject(bevanda, "idbevanda", row[0]);
+			cJSON_AddStringToObject(bevanda, "nome", row[1]);
+			cJSON_AddStringToObject(bevanda, "photo_url", row[2]);
+			cJSON_AddStringToObject(bevanda, "livello_alcolico", row[3]);
+			cJSON_AddStringToObject(bevanda, "descrizione", row[4]);
+			cJSON_AddStringToObject(bevanda, "categoria", row[5]);
+			cJSON_AddStringToObject(bevanda, "prezzo", row[6]);
 
-			fileJSON = cJSON_Print(root);
+			// Aggiungi l'oggetto JSON alla fine dell'array
+			cJSON_AddItemToArray(root, bevanda);
+			}
 
-			// Liberazione della memoria dell'oggetto JSON e della stringa JSON
-			cJSON_Delete(root);
-			//free(fileJSON);
+			fileJSON = cJSON_Print(root); // crea la stringa JSON dall'array completo
+			printf("%s",fileJSON);
+
 		}
-
-
-	}
-
-	mysql_free_result(result);
-	return fileJSON;
-
+		mysql_free_result(result);
+		return fileJSON;
 }
 void trim(char *str)
 {
@@ -116,7 +115,7 @@ void *thread_login(void *arg)
 
 	char *server="localhost"; //host a cui connettersi IP_privato
 	char *username="root"; //user db
-	char *password="Andrea99."; //password db
+	char *password="fulmine13"; //password db
 	char *database="melogiri"; //nomedb
 	char query[1000];
 
@@ -161,7 +160,6 @@ void *thread_login(void *arg)
     }
     while(bytesRecv == 0);
 
-
 	if(sceltaStart[0]=='1') //API LOGIN
 	{
 		//FORMATO RICHIESTA: 1carminefb@live.it&$password
@@ -193,6 +191,7 @@ void *thread_login(void *arg)
 		//verifico credenziali di accesso
 		MYSQL_RES *result;
 		MYSQL_ROW row;
+		char *fileJSON;
 
 		if(mysql_query(conn,query))
 		{
@@ -212,7 +211,7 @@ void *thread_login(void *arg)
 		{
 			printf("Accesso consentito\n");
 
-			while((row=mysql_fetch_row(result)) != NULL)
+			while((row = mysql_fetch_row(result)) != NULL)
 			{
 				 // Creazione dell'oggetto JSON
 				cJSON *root = cJSON_CreateObject();
@@ -223,16 +222,16 @@ void *thread_login(void *arg)
 				cJSON_AddStringToObject(root, "password", row[5]);
 				char *json_str = cJSON_Print(root);
 
-				send(newSocket, json_str, strlen(json_str), 0);
+				//send(newSocket, json_str, strlen(json_str), 0);
 				// Liberazione della memoria dell'oggetto JSON e della stringa JSON
 				cJSON_Delete(root);
 				free(json_str);
 			}
 
 			//GENERO LE BEVANDE
-			char *fileJSON = getBevande(row[0], conn);
+			fileJSON = getBevande(conn);
 			send(newSocket, fileJSON, strlen(fileJSON), 0);
-			free(fileJSON);
+			
 
 			mysql_free_result(result);
 		}
